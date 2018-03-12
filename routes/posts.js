@@ -35,7 +35,7 @@ router.post('/:postId/edit', checkLogIn, (req, res) => {
 });
 
 // GET /posts/:postId/remove 删除一篇文章
-router.get('/:postId/remove', checkLogin, (req, res, next) => {
+router.get('/:postId/remove', checkLogIn, (req, res) => {
   res.send('删除文章');
 });
 
