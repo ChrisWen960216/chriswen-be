@@ -16,6 +16,7 @@ const config = require('config-lite')(__dirname);
 const indexRouter = require('./routes/index');
 const errorHandle = require('./middlewares/errorHandle');
 
+const pkg = require('./package');
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -31,6 +32,18 @@ app.use(session({
 }));
 
 app.use(flash());
+app.locals.blog = {
+  title: pkg.name,
+  description: pkg.description,
+};
+
+app.use((request, response, next) => {
+  response.locals.user = request.session.user;
+  response.locals.success = request.flash('success').toString();
+  response.locals.error = request.flash('error').toString();
+  next();
+});
+
 app.use('/', indexRouter);
 app.use(errorHandle);
 app.listen(config.port);
