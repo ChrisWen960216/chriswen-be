@@ -1,11 +1,13 @@
 const express = require('express');
 
 const router = express.Router();
-const AuthCheck = require('../middlewares/authCheck');
+// const AuthCheck = require('../middlewares/authCheck');
 
-const checkLogIn = new AuthCheck().logIn;
+// const checkLogIn = new AuthCheck().logIn;
 
-router.get('/', checkLogIn, (req, res) => {
+const { checkLogin } = require('../middlewares/authCheck');
+
+router.get('/', checkLogin, (req, res) => {
   res.send('登出');
 });
 
