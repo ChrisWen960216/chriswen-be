@@ -2,12 +2,14 @@ const express = require('express');
 
 const router = express.Router();
 
-const usersRouter = require('./users');
-
 router.get('/', (request, response) => {
-  response.send('Hello World');
+  response.redirect('/posts');
 });
 
-router.use('/users', usersRouter);
+router.use('/signup', require('./signUp'));
+router.use('/signin', require('./signIn'));
+router.use('/signout', require('./signOut'));
+router.use('/posts', require('./posts'));
+router.use('/comments', require('./comments'));
 
 module.exports = router;
