@@ -4,5 +4,6 @@ const status = {
   TIME_OUT: 2,
   PERMISSION_DENIED: 3,
   DATA_ILLEGAL: 4,
+  PWD_ILLEGAL: 5,
 };
 module.exports = status;

@@ -11,7 +11,6 @@ module.exports = {
     if (!request.session || !request.session.user) {
       const resStatus = status.PERMISSION_DENIED;
       const resData = ResponseExtend.createResMsg(resStatus, '无权限操作');
-      request.session.user = 'ChrisWen';
       return response.send(resData);
     }
     return next();

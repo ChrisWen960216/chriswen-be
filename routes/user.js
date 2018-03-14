@@ -3,31 +3,38 @@ const express = require('express');
 const router = express.Router();
 
 const { checkLogin } = require('../middlewares/authCheck');
+const { $getPwd } = require('../lib/index');
 
 const ResponseExtend = require('../extends/response');
 const status = require('../common/status');
-// const Bcrypt = require('../common/bcrypt');
+const Bcrypt = require('../common/bcrypt');
 
-router.post('/login', checkLogin, (request, response) => {
-  const { user } = request.session;
-  const resData = ResponseExtend.createResMsg(status.OPS_SUCCESS, `Hello ${user}`);
-  return response.send(resData);
-  // const { user = '', password = '' } = request.body;
+router.post('/login', (request, response) => {
+  const { user = '', password = '' } = request.body;
+  let resData = {};
   // const mockData = 'ChrisWen';
 
-  // if (user === '' || password === '') {
-  //   const resData = ResponseExtend.createResMsg(status.DATA_ILLEGAL, '数据非法');
-  //   return response.json(resData);
-  // }
+  if (user === '' || password === '') {
+    resData = ResponseExtend.createResMsg(status.DATA_ILLEGAL, '数据非法');
+    return response.json(resData);
+  }
 
-  // return Bcrypt.bcryptData(password)
-  //   .then((hash) => {
-  //     Bcrypt.confirmData(hash, mockData);
-  //   })
-  //   .then(/* DB OPS */)
-  //   .catch((error) => {
-  //     throw new Error(error);
-  //   });
+  return $getPwd(user)
+    .then(pwd => Bcrypt.confirmData(password, pwd))
+    .then((result) => {
+      if (result === true) {
+        resData = ResponseExtend.createResMsg(status.OPS_SUCCESS, '登陆成功');
+        request.session.user = 'ChrisWen';
+      }
+      resData = ResponseExtend.createResData(status.PWD_ILLEGA, '密码错误');
+      return response.json(resData);
+    });
+});
+
+router.delete('/logout', checkLogin, (request, response) => {
+  request.session.user = null;
+  const resData = ResponseExtend.createResMsg(status.OPS_SUCCESS, '注销成功!');
+  return response.json(resData);
 });
 
 module.exports = router;
