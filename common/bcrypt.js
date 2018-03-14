@@ -1,6 +1,6 @@
 const bcrypt = require('bcryptjs');
 
-class BcryptData {
+class Bcrypt {
   constructor(data, bcryptData) {
     this.data = data;
     this.bcryptData = bcryptData;
@@ -42,5 +42,5 @@ class BcryptData {
   }
 }
 
-module.exports = BcryptData;
+module.exports = Bcrypt;
 

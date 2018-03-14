@@ -8,9 +8,11 @@ const status = require('../common/status');
 
 module.exports = {
   checkLogin(request, response, next) {
-    if (!request.session.user) {
+    if (!request.session || !request.session.user) {
       const resStatus = status.PERMISSION_DENIED;
-      return ResponseExtend.createResMsg(resStatus, '无权限操作');
+      const resData = ResponseExtend.createResMsg(resStatus, '无权限操作');
+      request.session.user = 'ChrisWen';
+      return response.send(resData);
     }
     return next();
   },

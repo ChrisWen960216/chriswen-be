@@ -5,6 +5,7 @@
 /* eslint-disable */
 function errorHandle(error, request, response, next) {
   const { code = 500 } = error;
+  console.log(error);
   return response.status(code).end('Service Unavilable');
 }
 
