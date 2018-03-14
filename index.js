@@ -44,6 +44,8 @@ app.use(require('express-formidable')({
 //   next();
 // });
 
-// app.use('/', indexRouter);
+app.use('/', (request, response) => {
+  response.send('Hello world');
+});
 app.use(errorHandle);
 app.listen(config.port);
