@@ -6,31 +6,37 @@ class BcryptData {
     this.bcryptData = bcryptData;
   }
 
-  hashData() {
+  getData() {
+    return this.data;
+  }
+
+  getDcryptData() {
+    return this.bcryptData;
+  }
+
+  static hashData(data) {
     return new Promise((resolve, reject) => {
-      const { data } = this;
       bcrypt.genSalt(10, (error, salt) => {
-        if (!error) {
-          bcrypt.hash(data, salt, (_error, hash) => {
-            if (!_error) {
-              return resolve(hash);
-            }
-            return reject(_error);
-          });
+        if (error) {
+          return reject(error);
         }
-        return reject(error);
+        return bcrypt.hash(data, salt, (_error, hash) => {
+          if (_error) {
+            return reject(_error);
+          }
+          return resolve(hash);
+        });
       });
     });
   }
 
-  confirmData() {
+  static confirmData(data, bcryptData) {
     return new Promise((resolve, reject) => {
-      const { data, bcryptData } = this;
-      return bcrypt.compare(data, bcryptData, (error, response) => {
-        if (!error) {
-          return resolve(response);
+      bcrypt.compare(data, bcryptData, (error, response) => {
+        if (error) {
+          return reject(error);
         }
-        return reject(error);
+        return resolve(response);
       });
     });
   }

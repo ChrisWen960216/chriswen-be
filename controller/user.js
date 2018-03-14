@@ -3,13 +3,14 @@
  *  UserController
  */
 
-class UserController {
-  constructor(request, response) {
-    this.request = request;
-    this.response = response;
-  }
+// class UserController {
+//   constructor(request, response) {
+//     this.request = request;
+//     this.response = response;
+//   }
 
-  logIn() {
-    const { request, response } = this;
-  }
-}
+//   logIn() {
+//     const { request } = this;
+//     const { user = '', password = '' } = request.session;
+//   }
+// }

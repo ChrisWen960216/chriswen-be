@@ -4,3 +4,6 @@ node_modules
 # config
 dist
 .vscode
+
+# test
+_test_
