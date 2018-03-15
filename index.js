@@ -6,20 +6,27 @@
 const express = require('express');
 
 const app = express();
+const bodyParser = require('body-parser');
+const cookieParser = require('cookie-parser');
 // const flash = require('connect-flash');
 const path = require('path');
 const session = require('express-session');
 // const MongoStore = require('connect-mongo')(session);
 const config = require('config-lite')(__dirname);
 
-
 // const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user');
 const errorHandle = require('./middlewares/errorHandle');
 
-// app.set('views', path.join(__dirname, 'views'));
-// app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'ejs');
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.json());
+app.use(cookieParser());
+
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 app.use(session({
   name: config.session.key,
@@ -30,12 +37,13 @@ app.use(session({
   // store: new MongoStore({ url: config.mongodb }),
 }));
 
+
 // app.use(flash());
 
-app.use(require('express-formidable')({
-  uploadDir: path.join(__dirname, 'public/img'),
-  keepExtensions: true,
-}));
+// app.use(require('express-formidable')({
+//   uploadDir: path.join(__dirname, 'public/img'),
+//   keepExtensions: true,
+// }));
 
 
 // app.use((request, response, next) => {
@@ -44,10 +52,10 @@ app.use(require('express-formidable')({
 //   response.locals.error = request.flash('error').toString();
 //   next();
 // });
-
-// app.use('/', (request, response) => {
-//   response.send('Hello world');
+// app.use('/', (req, res) => {
+//   res.end('AHHA');
 // });
+
 app.use('/user', userRouter);
 
 app.use(errorHandle);

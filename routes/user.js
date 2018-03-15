@@ -9,7 +9,12 @@ const ResponseExtend = require('../extends/response');
 const status = require('../common/status');
 const Bcrypt = require('../common/bcrypt');
 
+router.get('/', (request, response) => {
+  response.end('Hello World');
+});
+
 router.post('/login', (request, response) => {
+  console.log('HAHAHA');
   const { user = '', password = '' } = request.body;
   let resData = {};
   // const mockData = 'ChrisWen';
@@ -20,15 +25,19 @@ router.post('/login', (request, response) => {
   }
 
   return $getPwd(user)
-    .then(pwd => Bcrypt.confirmData(password, pwd))
+    .then((pwd) => {
+      if (!(pwd === null || undefined)) {
+        Bcrypt.confirmData(password, pwd);
+      }
+    })
     .then((result) => {
       if (result === true) {
         resData = ResponseExtend.createResMsg(status.OPS_SUCCESS, '登陆成功');
         request.session.user = 'ChrisWen';
       }
-      resData = ResponseExtend.createResData(status.PWD_ILLEGA, '密码错误');
+      resData = ResponseExtend.createResMsg(status.PWD_ILLEGAL, '用户名或者密码错误');
       return response.json(resData);
-    });
+    }).catch((error) => { console.log(error); });
 });
 
 router.delete('/logout', checkLogin, (request, response) => {
