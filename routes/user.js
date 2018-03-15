@@ -14,11 +14,8 @@ router.get('/', (request, response) => {
 });
 
 router.post('/login', (request, response) => {
-  console.log('HAHAHA');
   const { user = '', password = '' } = request.body;
   let resData = {};
-  // const mockData = 'ChrisWen';
-
   if (user === '' || password === '') {
     resData = ResponseExtend.createResMsg(status.DATA_ILLEGAL, '数据非法');
     return response.json(resData);
@@ -37,7 +34,10 @@ router.post('/login', (request, response) => {
       }
       resData = ResponseExtend.createResMsg(status.PWD_ILLEGAL, '用户名或者密码错误');
       return response.json(resData);
-    }).catch((error) => { console.log(error); });
+    })
+    .catch((error) => {
+      throw new Error(error);
+    });
 });
 
 router.delete('/logout', checkLogin, (request, response) => {
