@@ -1,4 +1,4 @@
-# API
+# User
 1. 登录
     + URL:`POST /user/login`
     + DATA:
