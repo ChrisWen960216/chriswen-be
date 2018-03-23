@@ -16,6 +16,8 @@ const config = require('config-lite')(__dirname);
 
 // const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user');
+const blogRouter = require('./routes/blog');
+const blogsRouter = require('./routes/blogs');
 const errorHandle = require('./middlewares/errorHandle');
 
 app.set('views', path.join(__dirname, 'views'));
@@ -57,6 +59,8 @@ app.use(session({
 // });
 
 app.use('/user', userRouter);
+app.use('/blog', blogRouter);
+app.use('/blogs', blogsRouter);
 
 app.use(errorHandle);
 app.listen(config.port);
