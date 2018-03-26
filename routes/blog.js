@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 const { checkLogin } = require('../middlewares/authCheck');
-const { $addBlog } = require('../lib/index');
+const { $addBlog, $getBlogById } = require('../lib/index');
 
 const ResponseExtend = require('../extends/response');
 const status = require('../common/status');
@@ -31,7 +31,18 @@ router.put('/:blogId', checkLogin, (request, response) => {
 
 router.get('/:blogId', (request, response) => {
   const { blogId } = request.params;
-  response.end(blogId);
+  let resData = {};
+  return $getBlogById(blogId).then((data) => {
+    const code = status.OPS_SUCCESS;
+    const message = '获取博客详情成功!';
+    resData = ResponseExtend.createResData(code, message, data);
+    return response.json(resData);
+  }).catch((error) => {
+    const code = status.OPS_FAILURE;
+    const message = error;
+    resData = ResponseExtend.createResMsg(code, message);
+    return response.json(resData);
+  });
 });
 
 // router.get('/:blogSpecies', (request, response) => {
