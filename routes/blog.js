@@ -25,13 +25,13 @@ router.post('/', (request, response) => {
 });
 
 router.put('/:blogId', checkLogin, (request, response) => {
-  const { blogId } = request.param;
+  const { blogId } = request.params;
   response.end('UPDATE_BLOG_BY_ID', blogId);
 });
 
 router.get('/:blogId', (request, response) => {
-  const { blogId } = request.param;
-  response.end('GET_BLOG_BY_ID', blogId);
+  const { blogId } = request.params;
+  response.end(blogId);
 });
 
 // router.get('/:blogSpecies', (request, response) => {
@@ -40,7 +40,7 @@ router.get('/:blogId', (request, response) => {
 // });
 
 router.delete('/:blogId', (request, response) => {
-  const { blogId } = request.param;
+  const { blogId } = request.params;
   response.end('DELETE_BLOG_BY_ID', blogId);
 });
 
