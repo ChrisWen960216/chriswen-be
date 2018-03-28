@@ -46,12 +46,24 @@ router.post('/login', (request, response) => {
   }
 
   return $getUserInfo(name)
-    .then(_user => Bcrypt.confirmData(password, _user.password))
+    .then((_user) => {
+      if (!_user) {
+        const error = '数据非法';
+        throw new Error(error);
+      }
+      return Bcrypt.confirmData(password, _user.password);
+    })
     .then((result) => {
       if (result === true) {
         resData = ResponseExtend.createResMsg(status.OPS_SUCCESS, '登陆成功');
         request.session.user = 'ChrisWen';
       } else {
+        resData = ResponseExtend.createResMsg(status.PWD_ILLEGAL, '数据非法');
+      }
+      return response.json(resData);
+    })
+    .catch((error) => {
+      if (error) {
         resData = ResponseExtend.createResMsg(status.PWD_ILLEGAL, '数据非法');
       }
       return response.json(resData);
