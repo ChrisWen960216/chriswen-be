@@ -11,7 +11,7 @@ module.exports = {
     if (!request.session || !request.session.user) {
       const resStatus = status.PERMISSION_DENIED;
       const resData = ResponseExtend.createResMsg(resStatus, '还没有登录');
-      return response.send(resData);
+      return response.json(resData);
     }
     return next();
   },

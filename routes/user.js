@@ -3,15 +3,22 @@ const express = require('express');
 const router = express.Router();
 
 const { checkLogin } = require('../middlewares/authCheck');
-const { $getPwd, $registerUser } = require('../lib/index');
+const { $getUserInfo, $registerUser } = require('../lib/index');
 
 const ResponseExtend = require('../extends/response');
 const status = require('../common/status');
 const Bcrypt = require('../common/bcrypt');
 
-router.get('/', (request, response) => {
-  response.end('Hello World');
-});
+// router.get('/info', (request, response) => {
+//   const { user } = request.session;
+//   const resData = {};
+//   return $getUserInfo(user).then((_user) => {
+//     if ((!_user) || (_user.authCode !== 0)) {
+//       const error = { code: status.PERMISSION_DENIED, msg: '用户权限验证失败' };
+//       throw new Error(error);
+//     }
+//   });
+// });
 
 router.post('/register', (request, response) => {
   const { name, password, authCode } = request.body.user;
@@ -23,8 +30,8 @@ router.post('/register', (request, response) => {
     resData = ResponseExtend.createResData(status.OPS_SUCCESS, '注册成功', _response);
     return response.json(resData);
   }).catch((error) => {
-    resData = ResponseExtend.createResMsg(status.OPS_FAILURE, error);
-    return response.json(resData);
+    const _error = { type: 'OPS_FAILURE', msg: error };
+    throw new Error(_error);
   });
 });
 
@@ -36,19 +43,21 @@ router.post('/login', (request, response) => {
     return response.json(resData);
   }
 
-  return $getPwd(name)
-    .then(pwd => Bcrypt.confirmData(password, pwd))
+  return $getUserInfo(name)
+    .then(_user => Bcrypt.confirmData(password, _user.password))
     .then((result) => {
       if (result === true) {
         resData = ResponseExtend.createResMsg(status.OPS_SUCCESS, '登陆成功');
         request.session.user = 'ChrisWen';
       } else {
-        resData = ResponseExtend.createResMsg(status.PWD_ILLEGAL, '用户名或者密码错误');
+        const _error = { type: 'PWD_ILLEGAL', msg: '用户名或者密码错误' };
+        throw new Error(_error);
       }
       return response.json(resData);
     })
     .catch((error) => {
-      throw new Error(error);
+      const _error = { type: 'OPS_FAILURE', msg: error };
+      throw new Error(_error);
     });
 });
 

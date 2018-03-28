@@ -1,3 +1,4 @@
+// error{type:specificErrorType,msg:Message}
 const express = require('express');
 
 const router = express.Router();
@@ -15,10 +16,8 @@ router.get('/', (request, response) => {
     resData = ResponseExtend.createResData(code, message, blogs);
     return response.json(resData);
   }).catch((error) => {
-    const code = status.OPS_FAILURE;
-    const message = error;
-    resData = ResponseExtend.createResMsg(code, message);
-    return response.json(resData);
+    const _error = { type: 'OPS_FAILURE', msg: error };
+    throw new Error(_error);
   });
 });
 
