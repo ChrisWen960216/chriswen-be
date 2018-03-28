@@ -17,9 +17,7 @@ router.post('/', (request, response) => {
     resData = ResponseExtend.createResData(code, message, _id);
     return response.json(resData);
   }).catch((error) => {
-    const code = status.OPS_FAILURE;
-    const message = error;
-    resData = ResponseExtend.createResMsg(code, message);
+    resData = ResponseExtend.createResMsg(status.OPS_FAILURE, error);
     return response.json(resData);
   });
 });
@@ -33,14 +31,10 @@ router.get('/:blogId', (request, response) => {
   const { blogId } = request.params;
   let resData = {};
   return $getBlogById(blogId).then((data) => {
-    const code = status.OPS_SUCCESS;
-    const message = '获取博客详情成功!';
-    resData = ResponseExtend.createResData(code, message, data);
+    resData = ResponseExtend.createResData(status.OPS_SUCCESS, '获取博客详情成功!', data);
     return response.json(resData);
   }).catch((error) => {
-    const code = status.OPS_FAILURE;
-    const message = error;
-    resData = ResponseExtend.createResMsg(code, message);
+    resData = ResponseExtend.createResMsg(status.OPS_FAILURE, error);
     return response.json(resData);
   });
 });

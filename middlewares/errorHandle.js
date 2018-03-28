@@ -7,8 +7,7 @@ const ResponseExtend = require('../extends/response');
 
 /* eslint-disable */
 function errorHandle(error, request, response, next) {
-  const {type='OPS_FAILURE',msg = '后台服务错误'} = error;
-  const resData = ResponseExtend.createResMsg(status[type],msg);
+  const resData = ResponseExtend.createResMsg(status.OPS_FAILURE,error);
   return response.json(resData);
 }
 
