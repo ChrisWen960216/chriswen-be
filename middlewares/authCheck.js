@@ -20,7 +20,7 @@ module.exports = {
       return next();
     }
     const resStatus = status.PERMISSION_DENIED;
-    const resData = ResponseExtend.createResMsg(resStatus, '还没有登录');
+    const resData = ResponseExtend.createResMsg(resStatus, '权限验证失败');
     return response.json(resData);
   },
 

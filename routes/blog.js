@@ -1,13 +1,13 @@
 const express = require('express');
 
 const router = express.Router();
-const { checkLogin } = require('../middlewares/authCheck');
+const { checkLogin, checkAdmin } = require('../middlewares/authCheck');
 const { $addBlog, $getBlogById } = require('../lib/index');
 
 const ResponseExtend = require('../extends/response');
 const status = require('../common/status');
 
-router.post('/', (request, response) => {
+router.post('/', checkAdmin, (request, response) => {
   const { blog } = request.body;
   let resData = {};
   return $addBlog(blog).then((data) => {
