@@ -15,6 +15,14 @@ module.exports = {
     }
     return next();
   },
+  checkAdmin(request, response, next) {
+    if (request.session.user === 'ChrisWen' && request.session.authCode === 0) {
+      return next();
+    }
+    const resStatus = status.PERMISSION_DENIED;
+    const resData = ResponseExtend.createResMsg(resStatus, '还没有登录');
+    return response.json(resData);
+  },
 
   // checkLogOut(request, response, next) {
   //   if (request.session.user) {

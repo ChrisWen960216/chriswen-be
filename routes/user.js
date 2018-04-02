@@ -57,6 +57,7 @@ router.post('/login', (request, response) => {
       if (result === true) {
         resData = ResponseExtend.createResMsg(status.OPS_SUCCESS, '登陆成功');
         request.session.user = 'ChrisWen';
+        request.session.authCode = 0;
       } else {
         resData = ResponseExtend.createResMsg(status.PWD_ILLEGAL, '数据非法');
       }
@@ -72,6 +73,7 @@ router.post('/login', (request, response) => {
 
 router.delete('/logout', checkLogin, (request, response) => {
   request.session.user = null;
+  request.session.authCode = null;
   const resData = ResponseExtend.createResMsg(status.OPS_SUCCESS, '注销成功!');
   return response.json(resData);
 });
