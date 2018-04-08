@@ -2,7 +2,7 @@ const express = require('express');
 
 const router = express.Router();
 const { checkLogin, checkAdmin } = require('../middlewares/authCheck');
-const { $addBlog, $getBlogById } = require('../lib/index');
+const { $addBlog, $getBlogById, $updateBlogById } = require('../lib/index');
 
 const ResponseExtend = require('../extends/response');
 const status = require('../common/status');
@@ -24,7 +24,15 @@ router.post('/', checkAdmin, (request, response) => {
 
 router.put('/:blogId', checkLogin, (request, response) => {
   const { blogId } = request.params;
-  response.end('UPDATE_BLOG_BY_ID', blogId);
+  const { blog } = request.body;
+  let resData = {};
+  return $updateBlogById(blogId, blog).then((data) => {
+    resData = ResponseExtend.createResData(status.OPS_SUCCESS, '更新成功!', { id: data });
+    return response.json(resData);
+  }).catch((error) => {
+    resData = ResponseExtend.createResMsg(status.OPS_FAILURE, error);
+    return response.json(resData);
+  });
 });
 
 router.get('/:blogId', (request, response) => {
