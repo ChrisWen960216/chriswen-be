@@ -2,7 +2,9 @@ const express = require('express');
 
 const router = express.Router();
 const { checkLogin, checkAdmin } = require('../middlewares/authCheck');
-const { $addBlog, $getBlogById, $updateBlogById } = require('../lib/index');
+const {
+  $addBlog, $getBlogById, $updateBlogById, $removeBlogById,
+} = require('../lib/index');
 
 const ResponseExtend = require('../extends/response');
 const status = require('../common/status');
@@ -54,7 +56,14 @@ router.get('/:blogId', (request, response) => {
 
 router.delete('/:blogId', (request, response) => {
   const { blogId } = request.params;
-  response.end('DELETE_BLOG_BY_ID', blogId);
+  let resData = {};
+  return $removeBlogById(blogId).then((data) => {
+    resData = ResponseExtend.createResData(status.OPS_SUCCESS, '删除博客成功', data);
+    return response.json(resData);
+  }).catch((error) => {
+    resData = ResponseExtend.createResMsg(status.OPS_FAILURE, error);
+    return response.json(resData);
+  });
 });
 
 module.exports = router;
