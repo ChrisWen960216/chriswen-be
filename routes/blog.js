@@ -13,11 +13,15 @@ router.post('/', checkAdmin, (request, response) => {
   const { blog } = request.body;
   let resData = {};
   return $addBlog(blog).then((data) => {
-    const { title, _id } = data;
-    const code = status.OPS_SUCCESS;
-    const message = `标题为${title}的博客添加成功，后台ID是${_id}`;
-    resData = ResponseExtend.createResData(code, message, _id);
-    return response.json(resData);
+    const error = new Error();
+    error.msg = '数据错误';
+    error.code = 0;
+    throw error;
+    // const { title, _id } = data;
+    // const code = status.OPS_SUCCESS;
+    // const message = `标题为${title}的博客添加成功，后台ID是${_id}`;
+    // resData = ResponseExtend.createResData(code, message, _id);
+    // return response.json(resData);
   }).catch((error) => {
     resData = ResponseExtend.createResMsg(status.OPS_FAILURE, error);
     return response.json(resData);
