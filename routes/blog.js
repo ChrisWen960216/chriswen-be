@@ -7,24 +7,21 @@ const {
 } = require('../lib/index');
 
 const ResponseExtend = require('../extends/response');
+const ErrorExtend = require('../extends/error');
 const status = require('../common/status');
 
 router.post('/', checkAdmin, (request, response) => {
   const { blog } = request.body;
   let resData = {};
   return $addBlog(blog).then((data) => {
-    const error = new Error();
-    error.msg = '数据错误';
-    error.code = 0;
-    throw error;
-    // const { title, _id } = data;
-    // const code = status.OPS_SUCCESS;
-    // const message = `标题为${title}的博客添加成功，后台ID是${_id}`;
-    // resData = ResponseExtend.createResData(code, message, _id);
-    // return response.json(resData);
-  }).catch((error) => {
-    resData = ResponseExtend.createResMsg(status.OPS_FAILURE, error);
+    const { title, _id } = data;
+    const code = status.OPS_SUCCESS;
+    const message = `标题为${title}的博客添加成功，后台ID是${_id}`;
+    resData = ResponseExtend.createResData(code, message, _id);
     return response.json(resData);
+  }).catch((error) => {
+    const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
+    throw _error;
   });
 });
 
@@ -36,8 +33,8 @@ router.put('/:blogId', checkLogin, (request, response) => {
     resData = ResponseExtend.createResData(status.OPS_SUCCESS, '更新成功!', { id: data });
     return response.json(resData);
   }).catch((error) => {
-    resData = ResponseExtend.createResMsg(status.OPS_FAILURE, error);
-    return response.json(resData);
+    const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
+    throw _error;
   });
 });
 
@@ -48,8 +45,8 @@ router.get('/:blogId', (request, response) => {
     resData = ResponseExtend.createResData(status.OPS_SUCCESS, '获取博客详情成功!', data);
     return response.json(resData);
   }).catch((error) => {
-    resData = ResponseExtend.createResMsg(status.OPS_FAILURE, error);
-    return response.json(resData);
+    const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
+    throw _error;
   });
 });
 
@@ -65,8 +62,8 @@ router.delete('/:blogId', (request, response) => {
     resData = ResponseExtend.createResData(status.OPS_SUCCESS, '删除博客成功', data);
     return response.json(resData);
   }).catch((error) => {
-    resData = ResponseExtend.createResMsg(status.OPS_FAILURE, error);
-    return response.json(resData);
+    const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
+    throw _error;
   });
 });
 

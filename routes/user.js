@@ -6,6 +6,8 @@ const { checkLogin } = require('../middlewares/authCheck');
 const { $getUserInfo, $registerUser } = require('../lib/index');
 
 const ResponseExtend = require('../extends/response');
+const ErrorExtend = require('../extends/error');
+
 const status = require('../common/status');
 const Bcrypt = require('../common/bcrypt');
 
@@ -23,6 +25,10 @@ router.get('/info', (request, response) => {
 });
 
 router.post('/register', (request, response) => {
+  if (!request.body.user) {
+    const _error = new ErrorExtend(status.OPS_FAILURE, '注册信息无法获取').createNewError();
+    throw _error;
+  }
   const { name, password, authCode } = request.body.user;
   let resData = {};
   Bcrypt.hashData(password).then((hash) => {
@@ -32,17 +38,21 @@ router.post('/register', (request, response) => {
     resData = ResponseExtend.createResData(status.OPS_SUCCESS, '注册成功', _response);
     return response.json(resData);
   }).catch((error) => {
-    resData = ResponseExtend.createResMsg(status.OPS_FAILURE, error);
-    return response.json(resData);
+    const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
+    throw _error;
   });
 });
 
 router.post('/login', (request, response) => {
+  if (!request.body.user) {
+    const _error = new ErrorExtend(status.OPS_FAILURE, '登录信息无法获取').createNewError();
+    throw _error;
+  }
   const { name = '', password = '' } = request.body.user;
   let resData = {};
   if (name === '' || password === '') {
-    resData = ResponseExtend.createResMsg(status.DATA_ILLEGAL, '数据非法');
-    return response.json(resData);
+    const _error = new ErrorExtend(status.DATA_ILLEGAL, '数据非法').createNewError();
+    throw _error;
   }
 
   return $getUserInfo(name)
@@ -59,13 +69,15 @@ router.post('/login', (request, response) => {
         request.session.user = 'ChrisWen';
         request.session.authCode = 0;
       } else {
-        resData = ResponseExtend.createResMsg(status.PWD_ILLEGAL, '数据非法');
+        const _error = new ErrorExtend(status.DATA_ILLEGAL, '数据非法').createNewError();
+        throw _error;
       }
       return response.json(resData);
     })
     .catch((error) => {
       if (error) {
-        resData = ResponseExtend.createResMsg(status.PWD_ILLEGAL, '数据非法');
+        const _error = new ErrorExtend(status.DATA_ILLEGAL, '数据非法').createNewError();
+        throw _error;
       }
       return response.json(resData);
     });

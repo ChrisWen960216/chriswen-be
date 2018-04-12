@@ -1,4 +1,9 @@
+/** Created By ChrisWen
+ *  超他妈无敌安全威风八面加密算法
+ */
+
 const bcrypt = require('bcryptjs');
+
 
 class Bcrypt {
   constructor(data, bcryptData) {
