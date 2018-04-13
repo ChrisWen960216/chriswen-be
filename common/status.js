@@ -5,5 +5,6 @@ const status = {
   PERMISSION_DENIED: 3,
   DATA_ILLEGAL: 4,
   PWD_ILLEGAL: 5,
+  NOT_FOUND: 10,
 };
 module.exports = status;

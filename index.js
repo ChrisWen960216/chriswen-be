@@ -19,6 +19,7 @@ const userRouter = require('./routes/user');
 const blogRouter = require('./routes/blog');
 const blogsRouter = require('./routes/blogs');
 const errorHandle = require('./middlewares/errorHandle');
+const notFoundHandle = require('./middlewares/notFoundHandle');
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
@@ -62,5 +63,7 @@ app.use('/user', userRouter);
 app.use('/blog', blogRouter);
 app.use('/blogs', blogsRouter);
 
+app.use(notFoundHandle);
 app.use(errorHandle);
+
 app.listen(config.port);
