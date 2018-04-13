@@ -9,6 +9,8 @@ const {
 const ResponseExtend = require('../extends/response');
 const ErrorExtend = require('../extends/error');
 const status = require('../common/status');
+const getStrDate = require('../common/date');
+
 
 router.post('/', checkAdmin, (request, response) => {
   const { blog } = request.body;
@@ -42,7 +44,9 @@ router.get('/:blogId', (request, response) => {
   const { blogId } = request.params;
   let resData = {};
   return $getBlogById(blogId).then((data) => {
-    resData = ResponseExtend.createResData(status.OPS_SUCCESS, '获取博客详情成功!', data);
+    const { _doc } = data;
+    const _data = { ..._doc, createTime: getStrDate(data.createTime) };
+    resData = ResponseExtend.createResData(status.OPS_SUCCESS, '获取博客详情成功!', _data);
     return response.json(resData);
   }).catch((error) => {
     const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
