@@ -44,11 +44,11 @@ router.post('/register', (request, response, next) => {
 });
 
 router.post('/login', (request, response, next) => {
-  if (!request.body.user) {
-    const _error = new ErrorExtend(status.OPS_FAILURE, '登录信息无法获取').createNewError();
-    throw _error;
-  }
-  const { name = '', password = '' } = request.body.user;
+  // if (!request.body.user) {
+  //   const _error = new ErrorExtend(status.OPS_FAILURE, '登录信息无法获取').createNewError();
+  //   throw _error;
+  // }
+  const { name = '', password = '' } = request.body;
   let resData = {};
   if (name === '' || password === '') {
     const _error = new ErrorExtend(status.DATA_ILLEGAL, '数据非法').createNewError();

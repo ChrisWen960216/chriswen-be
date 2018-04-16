@@ -3,7 +3,9 @@ const express = require('express');
 
 const router = express.Router();
 
-const { $getAllBlogs, $getBlogSpecies, $getBlogSequene } = require('../lib/index');
+const {
+  $getAllBlogs, $getBlogSpecies, $getBlogSequene, $createBlogSquene,
+} = require('../lib/index');
 
 // const ErrorExtend = require('../extends/error');
 const ResponseExtend = require('../extends/response');
@@ -66,6 +68,10 @@ router.get('/sequene', (request, response, next) => {
     next(error);
   });
 });
+
+router.post('/sequene', (request, response) => $createBlogSquene().then((_blogSequene) => {
+  response.json({ data: _blogSequene });
+}));
 
 
 // router.get('/:blogSpecies', (request, response) => {
