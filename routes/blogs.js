@@ -4,7 +4,8 @@ const express = require('express');
 const router = express.Router();
 
 const {
-  $getAllBlogs, $getBlogSpecies, $getBlogSequene, $updateBlogSequene,
+  $getAllBlogs, $getBlogSpecies, $getBlogSequence, $updateBlogSequene, $retrieveBlogsBySequnce,
+  // $createBlogSquence,
 } = require('../lib/index');
 
 const ErrorExtend = require('../extends/error');
@@ -59,38 +60,47 @@ router.get('/specieList', (request, response, next) => {
   });
 });
 
-router.get('/sequene', (request, response, next) => {
+router.get('/sequence', (request, response, next) => {
   let resData = {};
-  return $getBlogSequene().then((squene) => {
-    const code = status.OPS_SUCCESS;
-    const message = '操作成功';
-    // const _squene = squene;
-    resData = ResponseExtend.createResData(code, message, squene);
-    return response.json(resData);
-  }).catch((error) => {
-    // const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
-    next(error);
-  });
+  return $getBlogSequence()
+    .then(sequene => $retrieveBlogsBySequnce(sequene)
+      .then((_blogSequenceList) => {
+        const code = status.OPS_SUCCESS;
+        const message = '操作成功';
+        const data = {
+          sequene, _blogSequenceList,
+        };
+        resData = ResponseExtend.createResData(code, message, data);
+        return response.json(resData);
+      }))
+    .catch((error) => {
+      next(error);
+    });
 });
 
 router.put('/sequene', (request, response, next) => {
   const { sequene, _id } = request.body;
+  let resData = {};
   if (!sequene || !_id) {
     const error = new ErrorExtend(status.DATA_ILLEGAL, '数据非法').createNewError();
     throw error;
   }
-  return $updateBlogSequene(_id, sequene).then((_sequene) => {
-    let resData = {};
-    const code = status.OPS_SUCCESS;
-    const message = '操作成功';
-    resData = ResponseExtend.createResData(code, message, _sequene);
-    return response.json(resData);
-  }).catch((error) => {
-    next(error);
-  });
+  return $updateBlogSequene(_id, sequene).then(_sequene => $retrieveBlogsBySequnce(_sequene)
+    .then((_blogSequenceList) => {
+      const code = status.OPS_SUCCESS;
+      const message = '操作成功';
+      const data = {
+        _sequene, _blogSequenceList,
+      };
+      resData = ResponseExtend.createResData(code, message, data);
+      return response.json(resData);
+    }))
+    .catch((error) => {
+      next(error);
+    });
 });
 
-// router.post('/sequene', (request, response) => $createBlogSquene().then((_blogSequene) => {
+// router.post('/sequence', (request, response) => $createBlogSquence().then((_blogSequene) => {
 //   response.json({ data: _blogSequene });
 // }));
 
