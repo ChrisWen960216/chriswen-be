@@ -75,11 +75,7 @@ router.post('/login', (request, response) => {
       return response.json(resData);
     })
     .catch((error) => {
-      if (error) {
-        const _error = new ErrorExtend(status.DATA_ILLEGAL, '数据非法').createNewError();
-        throw _error;
-      }
-      return response.json(resData);
+      throw error;
     });
 });
 

@@ -5,7 +5,7 @@ const router = express.Router();
 
 const { $getAllBlogs, $getBlogSpecies, $getBlogSequene } = require('../lib/index');
 
-const ErrorExtend = require('../extends/error');
+// const ErrorExtend = require('../extends/error');
 const ResponseExtend = require('../extends/response');
 const status = require('../common/status');
 const { getDataByFilter } = require('../common/filter');
@@ -16,18 +16,27 @@ router.get('/', (request, response) => {
   let resData = {};
   let blogList = [];
   return $getAllBlogs(filter).then((blogs) => {
-    if (filter) {
-      blogList = getDataByFilter(filter, blogs);
-    } else {
-      blogList = blogs;
-    }
+    // return new Promise(resolove,reject) => {}
+    let _blogList = [];
+    _blogList = filter ? getDataByFilter(filter, blogs) : blogs;
+    blogList = _blogList.length
+      ? _blogList.map((_blog) => {
+        const dateStr = getStrDate(_blog.createTime);
+        const {
+          _id, title, species, content, introduce, auth,
+        } = _blog;
+        const $blog = {
+          _id, title, species, content, introduce, auth, createTime: dateStr,
+        };
+        return $blog;
+      }) : _blogList;
     const code = status.OPS_SUCCESS;
     const message = '操作成功';
     resData = ResponseExtend.createResData(code, message, blogList);
     return response.json(resData);
   }).catch((error) => {
-    const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
-    throw _error;
+    // const _error = new ErrorExtend(status.OPS_FAILURE, error);
+    throw error;
   });
 });
 
@@ -40,8 +49,8 @@ router.get('/specieList', (request, response) => {
     resData = ResponseExtend.createResData(code, message, species);
     return response.json(resData);
   }).catch((error) => {
-    const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
-    throw _error;
+    // const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
+    throw error;
   });
 });
 
@@ -54,8 +63,8 @@ router.get('/sequene', (request, response) => {
     resData = ResponseExtend.createResData(code, message, _squene);
     return response.json(resData);
   }).catch((error) => {
-    const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
-    throw _error;
+    // const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
+    throw error;
   });
 });
 
