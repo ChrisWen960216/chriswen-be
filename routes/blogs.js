@@ -11,7 +11,7 @@ const status = require('../common/status');
 const { getDataByFilter } = require('../common/filter');
 const getStrDate = require('../common/date');
 
-router.get('/', (request, response) => {
+router.get('/', (request, response, next) => {
   const { filter } = request.query;
   let resData = {};
   let blogList = [];
@@ -35,13 +35,12 @@ router.get('/', (request, response) => {
     resData = ResponseExtend.createResData(code, message, blogList);
     return response.json(resData);
   }).catch((error) => {
-    // const _error = new ErrorExtend(status.OPS_FAILURE, error);
-    throw error;
+    next(error);
   });
 });
 
 // Get all blogs species *** Not available yet
-router.get('/specieList', (request, response) => {
+router.get('/specieList', (request, response, next) => {
   let resData = {};
   return $getBlogSpecies().then((species) => {
     const code = status.OPS_SUCCESS;
@@ -50,11 +49,11 @@ router.get('/specieList', (request, response) => {
     return response.json(resData);
   }).catch((error) => {
     // const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
-    throw error;
+    next(error);
   });
 });
 
-router.get('/sequene', (request, response) => {
+router.get('/sequene', (request, response, next) => {
   let resData = {};
   return $getBlogSequene().then((squene) => {
     const code = status.OPS_SUCCESS;
@@ -64,7 +63,7 @@ router.get('/sequene', (request, response) => {
     return response.json(resData);
   }).catch((error) => {
     // const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
-    throw error;
+    next(error);
   });
 });
 

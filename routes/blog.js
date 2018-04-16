@@ -59,7 +59,7 @@ router.get('/:blogId', (request, response) => {
 //   response.end('GET_BLOG_BY_SPECIES', blogSpecies);
 // });
 
-router.delete('/:blogId', (request, response) => {
+router.delete('/:blogId', (request, response, next) => {
   const { blogId } = request.params;
   let resData = {};
   return $removeBlogById(blogId).then((data) => {
@@ -67,7 +67,7 @@ router.delete('/:blogId', (request, response) => {
     return response.json(resData);
   }).catch((error) => {
     const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
-    throw _error;
+    next(_error);
   });
 });
 

@@ -11,7 +11,7 @@ const ErrorExtend = require('../extends/error');
 const status = require('../common/status');
 const Bcrypt = require('../common/bcrypt');
 
-router.get('/info', (request, response) => {
+router.get('/info', (request, response, next) => {
   const { user } = request.session;
   let resData = {};
   return $getUserInfo(user).then((_user) => {
@@ -21,10 +21,10 @@ router.get('/info', (request, response) => {
       resData = ResponseExtend.createResMsg(status.OPS_SUCCESS, '权限验证成功');
     }
     return response.json(resData);
-  });
+  }).catch((error) => { next(error); });
 });
 
-router.post('/register', (request, response) => {
+router.post('/register', (request, response, next) => {
   if (!request.body.user) {
     const _error = new ErrorExtend(status.OPS_FAILURE, '注册信息无法获取').createNewError();
     throw _error;
@@ -39,11 +39,11 @@ router.post('/register', (request, response) => {
     return response.json(resData);
   }).catch((error) => {
     const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
-    throw _error;
+    next(_error);
   });
 });
 
-router.post('/login', (request, response) => {
+router.post('/login', (request, response, next) => {
   if (!request.body.user) {
     const _error = new ErrorExtend(status.OPS_FAILURE, '登录信息无法获取').createNewError();
     throw _error;
@@ -58,8 +58,8 @@ router.post('/login', (request, response) => {
   return $getUserInfo(name)
     .then((_user) => {
       if (!_user) {
-        const error = '数据非法';
-        throw new Error(error);
+        const _error = new ErrorExtend(status.DATA_ILLEGAL, '数据非法').createNewError();
+        throw _error;
       }
       return Bcrypt.confirmData(password, _user.password);
     })
@@ -75,7 +75,7 @@ router.post('/login', (request, response) => {
       return response.json(resData);
     })
     .catch((error) => {
-      throw error;
+      next(error);
     });
 });
 
