@@ -2,14 +2,33 @@ const ErrorExtend = require('../extends/error');
 const status = require('../common/status');
 
 function getDataByFilter(filter, data) {
-  if (!(filter instanceof Array || data instanceof Array)) {
-    const error = new ErrorExtend(status.DATA_ILLEGAL, 'Filter or data\'s type is not Array').createNewError();
+  if (!(data instanceof Array)) {
+    const error = new ErrorExtend(status.DATA_ILLEGAL, 'Data\'s type is not Array').createNewError();
     return error;
   }
-  const _resData = {};
-  filter.forEach((_filter) => {
-    _resData[_filter] = data[_filter];
-  });
+  let _resData = [];
+  if (filter instanceof Array) {
+    const finalDataArray = data.map((_data) => {
+      const filterData = {};
+      const $data = _data;
+      filter.forEach((_filter) => {
+        filterData[_filter] = $data[_filter];
+      });
+      return filterData;
+    });
+    _resData = finalDataArray;
+    // filter.forEach((_filter) => {
+    //   _resData[_filter] = data.map((_data) => {
+    //     const $data = _data;
+    //     return $data[_filter];
+    //   });
+    // });
+  } else {
+    _resData = data.map((_data) => {
+      const $data = _data;
+      return $data[filter];
+    });
+  }
   return _resData;
 }
 

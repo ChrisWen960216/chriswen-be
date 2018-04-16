@@ -4,10 +4,10 @@ const express = require('express');
 const router = express.Router();
 
 const {
-  $getAllBlogs, $getBlogSpecies, $getBlogSequene, $createBlogSquene,
+  $getAllBlogs, $getBlogSpecies, $getBlogSequene, $updateBlogSequene,
 } = require('../lib/index');
 
-// const ErrorExtend = require('../extends/error');
+const ErrorExtend = require('../extends/error');
 const ResponseExtend = require('../extends/response');
 const status = require('../common/status');
 const { getDataByFilter } = require('../common/filter');
@@ -20,18 +20,22 @@ router.get('/', (request, response, next) => {
   return $getAllBlogs(filter).then((blogs) => {
     // return new Promise(resolove,reject) => {}
     let _blogList = [];
-    _blogList = filter ? getDataByFilter(filter, blogs) : blogs;
-    blogList = _blogList.length
-      ? _blogList.map((_blog) => {
-        const dateStr = getStrDate(_blog.createTime);
-        const {
-          _id, title, species, content, introduce, auth,
-        } = _blog;
-        const $blog = {
-          _id, title, species, content, introduce, auth, createTime: dateStr,
-        };
-        return $blog;
-      }) : _blogList;
+    if (filter) {
+      _blogList = filter ? getDataByFilter(filter, blogs) : blogs;
+      blogList = _blogList;
+    } else {
+      blogList = blogs.length
+        ? blogs.map((_blog) => {
+          const dateStr = getStrDate(_blog.createTime);
+          const {
+            _id, title, species, content, introduce, auth,
+          } = _blog;
+          const $blog = {
+            _id, title, species, content, introduce, auth, createTime: dateStr,
+          };
+          return $blog;
+        }) : blogs;
+    }
     const code = status.OPS_SUCCESS;
     const message = '操作成功';
     resData = ResponseExtend.createResData(code, message, blogList);
@@ -60,8 +64,8 @@ router.get('/sequene', (request, response, next) => {
   return $getBlogSequene().then((squene) => {
     const code = status.OPS_SUCCESS;
     const message = '操作成功';
-    const _squene = squene.split(',');
-    resData = ResponseExtend.createResData(code, message, _squene);
+    // const _squene = squene;
+    resData = ResponseExtend.createResData(code, message, squene);
     return response.json(resData);
   }).catch((error) => {
     // const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
@@ -69,9 +73,26 @@ router.get('/sequene', (request, response, next) => {
   });
 });
 
-router.post('/sequene', (request, response) => $createBlogSquene().then((_blogSequene) => {
-  response.json({ data: _blogSequene });
-}));
+router.put('/sequene', (request, response, next) => {
+  const { sequene, _id } = request.body;
+  if (!sequene || !_id) {
+    const error = new ErrorExtend(status.DATA_ILLEGAL, '数据非法').createNewError();
+    throw error;
+  }
+  return $updateBlogSequene(_id, sequene).then((_sequene) => {
+    let resData = {};
+    const code = status.OPS_SUCCESS;
+    const message = '操作成功';
+    resData = ResponseExtend.createResData(code, message, _sequene);
+    return response.json(resData);
+  }).catch((error) => {
+    next(error);
+  });
+});
+
+// router.post('/sequene', (request, response) => $createBlogSquene().then((_blogSequene) => {
+//   response.json({ data: _blogSequene });
+// }));
 
 
 // router.get('/:blogSpecies', (request, response) => {
