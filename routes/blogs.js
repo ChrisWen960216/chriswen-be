@@ -4,7 +4,7 @@ const express = require('express');
 const router = express.Router();
 
 const {
-  $getAllBlogs, $getBlogSpecies, $getBlogSequence, $updateBlogSequene, $retrieveBlogsBySequence,
+  $getAllBlogs, $getBlogSpecies, $getBlogSequence, $updateBlogSequence, $retrieveBlogsBySequence,
   // $createBlogSquence,
 } = require('../lib/index');
 
@@ -94,14 +94,16 @@ router.put('/sequence', (request, response, next) => {
     const error = new ErrorExtend(status.DATA_ILLEGAL, '数据非法').createNewError();
     throw error;
   }
-  return $updateBlogSequene(_id, sequence).then((_sequence) => {
-    const $sequence = _sequence[0].sequence.map((id) => {
+  return $updateBlogSequence(_id, sequence).then((_sequence) => {
+    const { sequence: sequenceArray } = _sequence;
+    const $sequence = sequenceArray.map((id) => {
       let $id = id;
       if (!$id) {
         $id = '5acf07b273fa301c749d6571';
       }
       return $id;
     });
+
     return $retrieveBlogsBySequence($sequence)
       .then((_blogSequenceList) => {
         const code = status.OPS_SUCCESS;
