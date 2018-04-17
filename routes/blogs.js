@@ -60,65 +60,10 @@ router.get('/specieList', (request, response, next) => {
   });
 });
 
-router.get('/sequence', (request, response, next) => {
-  let resData = {};
-  return $getBlogSequence()
-    .then((sequene) => {
-      const $sequence = sequene[0].sequence.map((id) => {
-        let $id = id;
-        if (!$id) {
-          $id = '5acf07b273fa301c749d6571';
-        }
-        return $id;
-      });
-      return $retrieveBlogsBySequence($sequence)
-        .then((_blogSequenceList) => {
-          const code = status.OPS_SUCCESS;
-          const message = '操作成功';
-          const data = {
-            sequene, _blogSequenceList,
-          };
-          resData = ResponseExtend.createResData(code, message, data);
-          return response.json(resData);
-        });
-    })
-    .catch((error) => {
-      next(error);
-    });
-});
+router.get('/sequence', (request, response, next) => {});
 
-router.put('/sequence', (request, response, next) => {
-  const { sequence, _id } = request.body;
-  let resData = {};
-  if (!sequence || !_id) {
-    const error = new ErrorExtend(status.DATA_ILLEGAL, '数据非法').createNewError();
-    throw error;
-  }
-  return $updateBlogSequence(_id, sequence).then((_sequence) => {
-    const { sequence: sequenceArray } = _sequence;
-    const $sequence = sequenceArray.map((id) => {
-      let $id = id;
-      if (!$id) {
-        $id = '5acf07b273fa301c749d6571';
-      }
-      return $id;
-    });
+router.put('/sequence', (request, response, next) => {});
 
-    return $retrieveBlogsBySequence($sequence)
-      .then((_blogSequenceList) => {
-        const code = status.OPS_SUCCESS;
-        const message = '操作成功';
-        const data = {
-          sequence, _blogSequenceList,
-        };
-        resData = ResponseExtend.createResData(code, message, data);
-        return response.json(resData);
-      });
-  })
-    .catch((error) => {
-      next(error);
-    });
-});
 
 // router.post('/sequence', (request, response) => $createBlogSquence().then((_blogSequene) => {
 //   response.json({ data: _blogSequene });

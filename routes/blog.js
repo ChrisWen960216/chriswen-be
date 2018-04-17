@@ -1,10 +1,13 @@
 const express = require('express');
+const mongoose = require('mongoose');
 
 const router = express.Router();
 const { checkLogin, checkAdmin } = require('../middlewares/authCheck');
 const {
   $addBlog, $getBlogById, $updateBlogById, $removeBlogById,
 } = require('../lib/index');
+
+const { ObjectId } = mongoose.Types;
 
 const ResponseExtend = require('../extends/response');
 const ErrorExtend = require('../extends/error');
@@ -27,7 +30,7 @@ router.post('/', checkAdmin, (request, response) => {
   });
 });
 
-router.put('/:blogId', checkLogin, (request, response) => {
+router.put('/:blogId', checkLogin, (request, response, next) => {
   const { blogId } = request.params;
   const { blog } = request.body;
   let resData = {};
@@ -35,13 +38,16 @@ router.put('/:blogId', checkLogin, (request, response) => {
     resData = ResponseExtend.createResData(status.OPS_SUCCESS, '更新成功!', { id: data });
     return response.json(resData);
   }).catch((error) => {
-    const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
-    throw _error;
+    next(error);
   });
 });
 
-router.get('/:blogId', (request, response) => {
+router.get('/:blogId', (request, response, next) => {
   const { blogId } = request.params;
+  if (!ObjectId.isValid(blogId)) {
+    const error = new ErrorExtend(status.DATA_ILLEGAL, 'ID不正确').createNewError();
+    throw error;
+  }
   let resData = {};
   return $getBlogById(blogId).then((data) => {
     const { _doc } = data;
@@ -49,8 +55,7 @@ router.get('/:blogId', (request, response) => {
     resData = ResponseExtend.createResData(status.OPS_SUCCESS, '获取博客详情成功!', _data);
     return response.json(resData);
   }).catch((error) => {
-    const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
-    throw _error;
+    next(error);
   });
 });
 
