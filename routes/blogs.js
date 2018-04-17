@@ -1,13 +1,15 @@
 // error{type:specificErrorType,msg:Message}
 const express = require('express');
+const mongoose = require('mongoose');
 
 const router = express.Router();
 
 const {
-  $getAllBlogs, $getBlogSpecies, $getBlogSequence, $updateBlogSequence, $retrieveBlogsBySequence,
+  $getAllBlogs, $getBlogSpecies, $getBlogById, $getBlogSequence, $updateBlogSequence, $retrieveBlogsBySequence,
   // $createBlogSquence,
 } = require('../lib/index');
 
+const { ObjectId } = mongoose.Types;
 const ErrorExtend = require('../extends/error');
 const ResponseExtend = require('../extends/response');
 const status = require('../common/status');
@@ -54,13 +56,30 @@ router.get('/specieList', (request, response, next) => {
     const message = '操作成功';
     resData = ResponseExtend.createResData(code, message, species);
     return response.json(resData);
-  }).catch((error) => {
-    // const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
-    next(error);
-  });
+  }).catch(error => next(error));
 });
 
-router.get('/sequence', (request, response, next) => {});
+router.get('/sequence', (request, response, next) =>
+  $getBlogSequence()
+    .then((blogSequence) => {
+      const { _id, sequence } = blogSequence[0];
+      const _blogSequence = sequence.map((id) => {
+        if (ObjectId.isValid(id)) {
+          return $getBlogById(id).then((blog) => {
+            const { _id: $id, title, introduce } = blog;
+            return { _id: $id, title, introduce };
+          });
+        }
+        return { _id: '', title: '', introduce: '' };
+      });
+      return Promise.all([{ _id, sequence }, ..._blogSequence]);
+    })
+    .then((data) => {
+      const _data = { sequence: data[0], blogSequence: data[1] };
+      const resData = ResponseExtend.createResData(status.OPS_SUCCESS, '操作成功', _data);
+      return response.json(resData);
+    })
+    .catch(error => next(error)));
 
 router.put('/sequence', (request, response, next) => {});
 
