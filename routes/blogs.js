@@ -49,15 +49,15 @@ router.get('/', (request, response, next) => {
 });
 
 // Get all blogs species *** Not available yet
-router.get('/specieList', (request, response, next) => {
-  let resData = {};
-  return $getBlogSpecies().then((species) => {
-    const code = status.OPS_SUCCESS;
-    const message = '操作成功';
-    resData = ResponseExtend.createResData(code, message, species);
-    return response.json(resData);
-  }).catch(error => next(error));
-});
+// router.get('/specieList', (request, response, next) => {
+//   let resData = {};
+//   return $getBlogSpecies().then((species) => {
+//     const code = status.OPS_SUCCESS;
+//     const message = '操作成功';
+//     resData = ResponseExtend.createResData(code, message, species);
+//     return response.json(resData);
+//   }).catch(error => next(error));
+// });
 
 router.get('/sequence', (request, response, next) =>
   $getBlogSequence()
@@ -72,7 +72,7 @@ router.get('/sequence', (request, response, next) =>
         }
         return { _id: '', title: '', introduce: '' };
       });
-      return Promise.all([{ _id, sequence }, ..._blogSequence]);
+      return Promise.all([{ _id, sequence }, _blogSequence]);
     })
     .then((data) => {
       const _data = { sequence: data[0], blogSequence: data[1] };
@@ -81,7 +81,32 @@ router.get('/sequence', (request, response, next) =>
     })
     .catch(error => next(error)));
 
-router.put('/sequence', (request, response, next) => {});
+router.put('/sequence', (request, response, next) => {
+  const { _id, sequence } = request.body;
+  return $updateBlogSequence(_id, sequence).then((_res) => {
+    if (!_res) {
+      const error = new ErrorExtend(status.DATA_ILLEGAL, '博客队列的ID不正确!').createNewError();
+      throw error;
+    }
+    const _sequence = _res.sequence;
+    const _blogSequence = _sequence.map((blogId) => {
+      if (ObjectId.isValid(blogId)) {
+        return $getBlogById(blogId).then((blog) => {
+          const { _id: $id, title, introduce } = blog;
+          return { _id: $id, title, introduce };
+        });
+      }
+      return { _id: '', title: '', introduce: '' };
+    });
+    return Promise.all([{ _id, _sequence }, _blogSequence]);
+  })
+    .then((data) => {
+      const _data = { sequence: data[0], blogSequence: data[1] };
+      const resData = ResponseExtend.createResData(status.OPS_SUCCESS, '操作成功', _data);
+      return response.json(resData);
+    })
+    .catch(error => next(error));
+});
 
 
 // router.post('/sequence', (request, response) => $createBlogSquence().then((_blogSequene) => {
