@@ -72,10 +72,14 @@ router.get('/sequence', (request, response, next) =>
         }
         return { _id: '', title: '', introduce: '' };
       });
-      return Promise.all([{ _id, sequence }, _blogSequence]);
+      return Promise.all([{ _id, sequence }, ..._blogSequence]);
     })
     .then((data) => {
-      const _data = { sequence: data[0], blogSequence: data[1] };
+      const blogSequence = [];
+      for (let i = 1; i < data.length; i += 1) {
+        blogSequence.push(data[i]);
+      }
+      const _data = { sequence: data[0], blogSequence };
       const resData = ResponseExtend.createResData(status.OPS_SUCCESS, '操作成功', _data);
       return response.json(resData);
     })
@@ -88,6 +92,7 @@ router.put('/sequence', (request, response, next) => {
       const error = new ErrorExtend(status.DATA_ILLEGAL, '博客队列的ID不正确!').createNewError();
       throw error;
     }
+
     const _sequence = _res.sequence;
     const _blogSequence = _sequence.map((blogId) => {
       if (ObjectId.isValid(blogId)) {
@@ -98,10 +103,15 @@ router.put('/sequence', (request, response, next) => {
       }
       return { _id: '', title: '', introduce: '' };
     });
-    return Promise.all([{ _id, _sequence }, _blogSequence]);
+    return Promise.all([{ _id, sequence: _sequence }, ..._blogSequence]);
   })
     .then((data) => {
-      const _data = { sequence: data[0], blogSequence: data[1] };
+      console.log(data);
+      const blogSequence = [];
+      for (let i = 1; i < data.length; i += 1) {
+        blogSequence.push(data[i]);
+      }
+      const _data = { sequence: data[0], blogSequence };
       const resData = ResponseExtend.createResData(status.OPS_SUCCESS, '操作成功', _data);
       return response.json(resData);
     })
