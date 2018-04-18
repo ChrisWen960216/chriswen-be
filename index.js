@@ -11,6 +11,7 @@ const cookieParser = require('cookie-parser');
 // const flash = require('connect-flash');
 const path = require('path');
 const session = require('express-session');
+const formiable = require('express-formidable');
 // const MongoStore = require('connect-mongo')(session);
 const config = require('config-lite')(__dirname);
 
@@ -18,11 +19,15 @@ const config = require('config-lite')(__dirname);
 const userRouter = require('./routes/user');
 const blogRouter = require('./routes/blog');
 const blogsRouter = require('./routes/blogs');
+const uploadRouter = require('./routes/upload');
+
 const errorHandle = require('./middlewares/errorHandle');
 const notFoundHandle = require('./middlewares/notFoundHandle');
 
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+
+app.use('/upload', uploadRouter);
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -37,31 +42,16 @@ app.use(session({
   resave: true,
   saveUninitialized: false,
   cookie: { maxAge: config.session.maxAge },
-  // store: new MongoStore({ url: config.mongodb }),
 }));
-
-
-// app.use(flash());
-
-// app.use(require('express-formidable')({
-//   uploadDir: path.join(__dirname, 'public/img'),
-//   keepExtensions: true,
-// }));
-
-
-// app.use((request, response, next) => {
-//   response.locals.user = request.session.user;
-//   response.locals.success = request.flash('success').toString();
-//   response.locals.error = request.flash('error').toString();
-//   next();
-// });
-// app.use('/', (req, res) => {
-//   res.end('AHHA');
-// });
 
 app.use('/user', userRouter);
 app.use('/blog', blogRouter);
 app.use('/blogs', blogsRouter);
+// app.use('/upload', formiable({
+//   uploadDir: path.join(__dirname, '/public/img'),
+//   keepExtensions: true,
+// }), uploadRouter);
+
 
 app.use(notFoundHandle);
 app.use(errorHandle);

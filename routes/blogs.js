@@ -106,7 +106,6 @@ router.put('/sequence', (request, response, next) => {
     return Promise.all([{ _id, sequence: _sequence }, ..._blogSequence]);
   })
     .then((data) => {
-      console.log(data);
       const blogSequence = [];
       for (let i = 1; i < data.length; i += 1) {
         blogSequence.push(data[i]);
