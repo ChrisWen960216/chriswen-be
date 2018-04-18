@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const router = express.Router();
 
 const {
-  $getAllBlogs, $getBlogSpecies, $getBlogById, $getBlogSequence, $updateBlogSequence, $retrieveBlogsBySequence,
+  $getAllBlogs, $getBlogSpecies, $getBlogById, $getBlogSequence, $updateBlogSequence, $getBlogBySpecies,
   // $createBlogSquence,
 } = require('../lib/index');
 
@@ -124,21 +124,20 @@ router.put('/sequence', (request, response, next) => {
 // }));
 
 
-// router.get('/:blogSpecies', (request, response) => {
-//   //
-//   // let resData = {};
-//   // const { blogSpecies } = request.params;
-//   // return $getBlogBySpecies(blogSpecies).then((blogs) => {
-//   //   const code = status.OPS_SUCCESS;
-//   //   const message = '操作成功';
-//   //   resData = ResponseExtend.createResData(code, message, blogs);
-//   //   return response.json(resData);
-//   // }).catch((error) => {
-//   //   const code = status.OPS_FAILURE;
-//   //   const message = error;
-//   //   resData = ResponseExtend.createResMsg(code, message);
-//   //   return response.json(resData);
-//   // });
-// });
+router.get('/:blogSpecies', (request, response) => {
+  let resData = {};
+  const { blogSpecies } = request.params;
+  return $getBlogBySpecies(blogSpecies).then((blogs) => {
+    const code = status.OPS_SUCCESS;
+    const message = '操作成功';
+    resData = ResponseExtend.createResData(code, message, blogs);
+    return response.json(resData);
+  }).catch((error) => {
+    const code = status.OPS_FAILURE;
+    const message = error;
+    resData = ResponseExtend.createResMsg(code, message);
+    return response.json(resData);
+  });
+});
 
 module.exports = router;
