@@ -11,7 +11,7 @@ const cookieParser = require('cookie-parser');
 // const flash = require('connect-flash');
 const path = require('path');
 const session = require('express-session');
-const formiable = require('express-formidable');
+// const formiable = require('express-formidable');
 // const MongoStore = require('connect-mongo')(session);
 const config = require('config-lite')(__dirname);
 
@@ -20,6 +20,7 @@ const userRouter = require('./routes/user');
 const blogRouter = require('./routes/blog');
 const blogsRouter = require('./routes/blogs');
 const uploadRouter = require('./routes/upload');
+const carouselRouter = require('./routes/carousel');
 
 const errorHandle = require('./middlewares/errorHandle');
 const notFoundHandle = require('./middlewares/notFoundHandle');
@@ -47,6 +48,7 @@ app.use(session({
 app.use('/user', userRouter);
 app.use('/blog', blogRouter);
 app.use('/blogs', blogsRouter);
+app.use('/carousel', carouselRouter);
 // app.use('/upload', formiable({
 //   uploadDir: path.join(__dirname, '/public/img'),
 //   keepExtensions: true,

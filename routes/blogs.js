@@ -5,7 +5,7 @@ const mongoose = require('mongoose');
 const router = express.Router();
 
 const {
-  $getAllBlogs, $getBlogSpecies, $getBlogById, $getBlogSequence, $updateBlogSequence, $getBlogBySpecies,
+  $getAllBlogs, $getBlogById, $getBlogSequence, $updateBlogSequence, $getBlogBySpecies,
   // $createBlogSquence,
 } = require('../lib/index');
 
