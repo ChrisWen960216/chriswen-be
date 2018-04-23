@@ -10,3 +10,6 @@ _test_
 # cache
 cache
 dist
+
+# public
+public/img
