@@ -31,6 +31,17 @@ class FileService {
       });
     });
   }
+
+  static delFile(path) {
+    return new Promise((resolve, reject) => {
+      fs.unlink(path, (error) => {
+        if (error) {
+          return reject(error);
+        }
+        return resolve(1);
+      });
+    });
+  }
 }
 
 module.exports = FileService;
