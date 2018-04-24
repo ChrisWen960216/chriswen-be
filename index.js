@@ -20,7 +20,7 @@ const userRouter = require('./routes/user');
 const blogRouter = require('./routes/blog');
 const blogsRouter = require('./routes/blogs');
 const uploadRouter = require('./routes/upload');
-// const carouselRouter = require('./routes/carousel');
+const carouselRouter = require('./routes/carousel');
 const filedsRouter = require('./routes/fileds');
 
 const errorHandle = require('./middlewares/errorHandle');
@@ -49,7 +49,7 @@ app.use('/user', userRouter);
 app.use('/blog', blogRouter);
 app.use('/blogs', blogsRouter);
 app.use('/upload', uploadRouter);
-// app.use('/carousel', carouselRouter);
+app.use('/carousel', carouselRouter);
 app.use('/fileds', filedsRouter);
 // app.use('/upload', formiable({
 //   uploadDir: path.join(__dirname, '/public/img'),
