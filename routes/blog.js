@@ -1,79 +1,63 @@
 const express = require('express');
-const mongoose = require('mongoose');
 
 const router = express.Router();
-const { checkLogin, checkAdmin } = require('../middlewares/authCheck');
-const {
-  $addBlog, $getBlogById, $updateBlogById, $removeBlogById,
-} = require('../lib/index');
-
-const { ObjectId } = mongoose.Types;
-
+const { checkAdmin } = require('../middlewares/authCheck');
+const { filterBlog, filterId } = require('../middlewares/filter');
+const Blog = require('../lib/blog');
 const ResponseExtend = require('../extends/response');
-const ErrorExtend = require('../extends/error');
 const status = require('../common/status');
-const getStrDate = require('../common/date');
 
 
-router.post('/', checkAdmin, (request, response) => {
-  const { blog } = request.body;
-  let resData = {};
-  return $addBlog(blog).then((data) => {
-    const { title, _id } = data;
-    const code = status.OPS_SUCCESS;
-    const message = `标题为${title}的博客添加成功，后台ID是${_id}`;
-    resData = ResponseExtend.createResData(code, message, _id);
-    return response.json(resData);
-  }).catch((error) => {
-    const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
-    throw _error;
-  });
+const BlogService = require('../service/blog');
+
+/**
+ * router.post('/', checkAdmin, filterBlog, (request, response, next) => new Blog(request.body.blog, null)
+  .createBlog()
+  .then(_response => new BlogService(_response).createResBlog())
+  .then(resBlog => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '创建成功!', { blog: resBlog })))
+  .catch(error => next(error)));
+
+router.put('/:blogId', checkLogin, filterBlog, (request, response, next) => new Blog(request.body.blog, { _id: request.params.blogId })
+  .updateBlogById()
+  .then(_response => new BlogService(_response).createResBlog())
+  .then(resBlog => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '修改成功!', { blog: resBlog })))
+  .catch(error => next(error)));
+ */
+
+router.post('/', checkAdmin, filterBlog, (request, response, next) => {
+  const { blog: _blog } = request.body;
+  return new Blog(_blog, null)
+    .createBlog()
+    .then(_response => new BlogService(_response).createResBlog())
+    .then(resBlog => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '创建成功!', { blog: resBlog })))
+    .catch(error => next(error));
 });
 
-router.put('/:blogId', checkLogin, (request, response, next) => {
+router.put('/:blogId', filterId, filterBlog, (request, response, next) => {
   const { blogId } = request.params;
-  const { blog } = request.body;
-  let resData = {};
-  return $updateBlogById(blogId, blog).then((data) => {
-    resData = ResponseExtend.createResData(status.OPS_SUCCESS, '更新成功!', { id: data });
-    return response.json(resData);
-  }).catch((error) => {
-    next(error);
-  });
+  const { blog: _blog } = request.body;
+  return new Blog(_blog, { _id: blogId })
+    .updateBlogById()
+    .then(_response => new BlogService(_response).createResBlog())
+    .then(resBlog => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '修改成功!', { blog: resBlog })))
+    .catch(error => next(error));
 });
 
-router.get('/:blogId', (request, response, next) => {
-  const { blogId } = request.params;
-  if (!ObjectId.isValid(blogId)) {
-    const error = new ErrorExtend(status.DATA_ILLEGAL, 'ID不正确').createNewError();
-    throw error;
-  }
-  let resData = {};
-  return $getBlogById(blogId).then((data) => {
-    const { _doc } = data;
-    const _data = { ..._doc, createTime: getStrDate(data.createTime) };
-    resData = ResponseExtend.createResData(status.OPS_SUCCESS, '获取博客详情成功!', _data);
-    return response.json(resData);
-  }).catch((error) => {
-    next(error);
-  });
+router.get('/:blogId', filterId, (request, response, next) => {
+  const { blogId: _id } = request.params;
+  return new Blog(null, { _id })
+    .retrieveBlogById()
+    .then(_response => new BlogService(_response).createResBlog())
+    .then(resBlog => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '查询成功!', { blog: resBlog })))
+    .catch(error => next(error));
 });
 
-// router.get('/:blogSpecies', (request, response) => {
-//   const { blogSpecies } = request.param;
-//   response.end('GET_BLOG_BY_SPECIES', blogSpecies);
-// });
-
-router.delete('/:blogId', (request, response, next) => {
-  const { blogId } = request.params;
-  let resData = {};
-  return $removeBlogById(blogId).then((data) => {
-    resData = ResponseExtend.createResData(status.OPS_SUCCESS, '删除博客成功', data);
-    return response.json(resData);
-  }).catch((error) => {
-    const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
-    next(_error);
-  });
+router.delete('/:blogId', filterId, (request, response, next) => {
+  const { blogId: _id } = request.params;
+  return new Blog(null, { _id })
+    .deleteBlogById()
+    .then(blogId => response.json(ResponseExtend.createResMsg(status.OPS_SUCCESS, `ID:${blogId}的博客删除成功`)))
+    .catch(error => next(error));
 });
 
 module.exports = router;

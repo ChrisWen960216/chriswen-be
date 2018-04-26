@@ -24,7 +24,7 @@ const {
 
 router.get('/', (request, response, next) => $retrieveCarouselSequence()
   .then((carousel) => {
-    const resData = ResponseExtends.createResData(status.OPS_SUCCESS, '获取成功', carousel);
+    const resData = ResponseExtends.createResData(status.OPS_SUCCESS, '获取成功', ...carousel);
     return resData;
   })
   .then(resData => response.json(resData))

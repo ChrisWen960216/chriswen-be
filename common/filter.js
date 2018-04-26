@@ -17,12 +17,6 @@ function getDataByFilter(filter, data) {
       return filterData;
     });
     _resData = finalDataArray;
-    // filter.forEach((_filter) => {
-    //   _resData[_filter] = data.map((_data) => {
-    //     const $data = _data;
-    //     return $data[_filter];
-    //   });
-    // });
   } else {
     _resData = data.map((_data) => {
       const $data = _data;
