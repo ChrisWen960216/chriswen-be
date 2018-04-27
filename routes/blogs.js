@@ -15,49 +15,28 @@ const ResponseExtend = require('../extends/response');
 const status = require('../common/status');
 const { getDataByFilter } = require('../common/filter');
 const getStrDate = require('../common/date');
+const Blog = require('../lib/blog');
 
 router.get('/', (request, response, next) => {
   const { filter } = request.query;
-  let resData = {};
-  let blogList = [];
-  return $getAllBlogs(filter).then((blogs) => {
-    // return new Promise(resolove,reject) => {}
-    let _blogList = [];
-    if (filter) {
-      _blogList = filter ? getDataByFilter(filter, blogs) : blogs;
-      blogList = _blogList;
-    } else {
-      blogList = blogs.length
-        ? blogs.map((_blog) => {
-          const dateStr = getStrDate(_blog.createTime);
-          const {
-            _id, title, species, content, introduce, auth,
-          } = _blog;
-          const $blog = {
-            _id, title, species, content, introduce, auth, createTime: dateStr,
-          };
-          return $blog;
-        }) : blogs;
-    }
-    const code = status.OPS_SUCCESS;
-    const message = '操作成功';
-    resData = ResponseExtend.createResData(code, message, blogList);
-    return response.json(resData);
-  }).catch((error) => {
-    next(error);
-  });
+  new Blog()
+    .retrieveBlogs()
+    .then(_res => getDataByFilter(filter, _res))
+    .then((_filterRes) => {
+      let $filterBlogs = _filterRes;
+      if (_filterRes[0].createTime) {
+        $filterBlogs = _filterRes.map((blog) => {
+          const _blog = blog;
+          const { createTime } = _blog;
+          _blog.createTime = getStrDate(createTime);
+          return _blog;
+        });
+      }
+      return $filterBlogs;
+    })
+    .then(resData => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '获取成功', { blogList: resData })))
+    .catch(next);
 });
-
-// Get all blogs species *** Not available yet
-// router.get('/specieList', (request, response, next) => {
-//   let resData = {};
-//   return $getBlogSpecies().then((species) => {
-//     const code = status.OPS_SUCCESS;
-//     const message = '操作成功';
-//     resData = ResponseExtend.createResData(code, message, species);
-//     return response.json(resData);
-//   }).catch(error => next(error));
-// });
 
 router.get('/sequence', (request, response, next) =>
   $getBlogSequence()

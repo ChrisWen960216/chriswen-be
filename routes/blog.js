@@ -1,13 +1,13 @@
 const express = require('express');
 
 const router = express.Router();
+
 const { checkAdmin } = require('../middlewares/authCheck');
 const { filterBlog, filterId } = require('../middlewares/filter');
+
 const Blog = require('../lib/blog');
 const ResponseExtend = require('../extends/response');
 const status = require('../common/status');
-
-
 const BlogService = require('../service/blog');
 
 /**
@@ -33,6 +33,15 @@ router.post('/', checkAdmin, filterBlog, (request, response, next) => {
     .catch(error => next(error));
 });
 
+router.get('/:blogId', filterId, (request, response, next) => {
+  const { blogId: _id } = request.params;
+  return new Blog(null, { _id })
+    .retrieveBlogById()
+    .then(_response => new BlogService(_response).createResBlog())
+    .then(resBlog => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '查询成功!', { blog: resBlog })))
+    .catch(error => next(error));
+});
+
 router.put('/:blogId', filterId, filterBlog, (request, response, next) => {
   const { blogId } = request.params;
   const { blog: _blog } = request.body;
@@ -40,15 +49,6 @@ router.put('/:blogId', filterId, filterBlog, (request, response, next) => {
     .updateBlogById()
     .then(_response => new BlogService(_response).createResBlog())
     .then(resBlog => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '修改成功!', { blog: resBlog })))
-    .catch(error => next(error));
-});
-
-router.get('/:blogId', filterId, (request, response, next) => {
-  const { blogId: _id } = request.params;
-  return new Blog(null, { _id })
-    .retrieveBlogById()
-    .then(_response => new BlogService(_response).createResBlog())
-    .then(resBlog => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '查询成功!', { blog: resBlog })))
     .catch(error => next(error));
 });
 
