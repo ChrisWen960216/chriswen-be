@@ -29,9 +29,13 @@ router.get('/info', (request, response, next) => {
 
 router.post('/register', (request, response, next) =>
   new UserController(request)
+    // Retrieve userInfo from request body
     .retrieveUserInfo()
+    // Bcrypt userInfo
     .then(userInfo => Promise.all({ name: userInfo.name, password: Bcrypt.hashData(userInfo.password), authCode: userInfo.authCode }))
+    // Save userInfo into DB
     .then(bcryptInfo => $registerUser(bcryptInfo[0]))
+    // Response data
     .then(_res => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '注册成功', _res)))
     .catch(next));
 
