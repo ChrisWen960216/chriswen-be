@@ -27,32 +27,26 @@ router.get('/info', (request, response, next) => {
   }).catch((error) => { next(error); });
 });
 
-router.post('/register', (request, response, next) => {
-  if (!request.body.user) {
-    const _error = new ErrorExtend(status.OPS_FAILURE, '注册信息无法获取').createNewError();
-    throw _error;
-  }
-  const { name, password, authCode } = request.body.user;
-  let resData = {};
-  Bcrypt.hashData(password).then((hash) => {
-    const userInfo = { name, password: hash, authCode };
-    return $registerUser(userInfo);
-  }).then((_response) => {
-    resData = ResponseExtend.createResData(status.OPS_SUCCESS, '注册成功', _response);
-    return response.json(resData);
-  }).catch((error) => {
-    const _error = new ErrorExtend(status.OPS_FAILURE, error).createNewError();
-    next(_error);
-  });
-});
+router.post('/register', (request, response, next) =>
+  new UserController(request)
+    .retrieveUserInfo()
+    .then(userInfo => Promise.all({ name: userInfo.name, password: Bcrypt.hashData(userInfo.password), authCode: userInfo.authCode }))
+    .then(bcryptInfo => $registerUser(bcryptInfo[0]))
+    .then(_res => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '注册成功', _res)))
+    .catch(next));
 
 router.post('/login', (request, response, next) =>
   // MiddleWares - Controller - Service - Extend - Error
   new UserController(request)
+    // retrieveUserInfo from request body
     .retrieveUserInfo()
+    // retrieveUserInfo from DB by userName
     .then(userInfo => Promise.all([new User(userInfo, null).retrieveUserInfoByName(), userInfo.password]))
+    // checkout password
     .then(infoArray => Bcrypt.confirmData(infoArray[1], infoArray[0] ? infoArray[0].password : ''))
+    // if password does not match, throw an error
     .then(result => (result || new ErrorExtend(status.DATA_ILLEGAL, '账号或者密码不对')))
+    // response correct data
     .then((resData) => {
       request.session.user = 'ChrisWen';
       request.session.authCode = 0;
@@ -60,45 +54,10 @@ router.post('/login', (request, response, next) =>
     })
     .catch(next));
 
-
-// .then(userInfo => {})
-
-// const { name = '', password = '' } = request.body;
-// let resData = {};
-// if (name === '' || password === '') {
-//   const _error = new ErrorExtend(status.DATA_ILLEGAL, '数据非法').createNewError();
-//   throw _error;
-// }
-
-// return $getUserInfo(name)
-//   .then((_user) => {
-//     if (!_user) {
-//       const _error = new ErrorExtend(status.DATA_ILLEGAL, '数据非法').createNewError();
-//       throw _error;
-//     }
-//     return Bcrypt.confirmData(password, _user.password);
-//   })
-//   .then((result) => {
-//     if (result === true) {
-//       resData = ResponseExtend.createResMsg(status.OPS_SUCCESS, '登陆成功');
-//       request.session.user = 'ChrisWen';
-//       request.session.authCode = 0;
-//     } else {
-//       const _error = new ErrorExtend(status.DATA_ILLEGAL, '数据非法').createNewError();
-//       throw _error;
-//     }
-//     return response.json(resData);
-//   })
-//   .catch((error) => {
-//     next(error);
-//   });
-
-
 router.delete('/logout', checkLogin, (request, response) => {
   request.session.user = null;
   request.session.authCode = null;
-  const resData = ResponseExtend.createResMsg(status.OPS_SUCCESS, '注销成功!');
-  return response.json(resData);
+  return response.json(ResponseExtend.createResMsg(status.OPS_SUCCESS, '注销成功!'));
 });
 
 module.exports = router;

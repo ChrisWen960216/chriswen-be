@@ -8,12 +8,12 @@ class UserController {
 
   retrieveUserInfo() {
     return new Promise((resolve, reject) => {
-      const { name, password } = this.request.body;
+      const { name, password, authCode } = this.request.body;
       if (!name || !password) {
         const error = new ErrorExtend(status.DATA_ILLEGAL, '找不到用户名或者密码').createNewError();
         return reject(error);
       }
-      return resolve({ name, password });
+      return resolve({ name, password, authCode });
     });
   }
 }
