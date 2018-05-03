@@ -14,7 +14,18 @@ class UserController {
         return reject(error);
       }
       return resolve({ name, password, authCode });
-    });
+    }).catch((error) => { throw (error); });
+  }
+
+  retrieveUserName() {
+    return new Promise((resolve, reject) => {
+      const { user } = this.request.session;
+      if (!user) {
+        const error = new ErrorExtend(status.DATA_ILLEGAL, '获取不到用户信息').createNewError();
+        return reject(error);
+      }
+      return resolve(user);
+    }).catch((error) => { throw (error); });
   }
 }
 

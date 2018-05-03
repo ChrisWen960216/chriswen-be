@@ -9,6 +9,8 @@ const User = require('../lib/user');
 const ResponseExtend = require('../extends/response');
 const ErrorExtend = require('../extends/error');
 
+const UserService = require('../service/user');
+
 const status = require('../common/status');
 const Bcrypt = require('../common/bcrypt');
 
