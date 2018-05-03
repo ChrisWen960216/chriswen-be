@@ -8,8 +8,8 @@ class UserService {
 
   infoValidate() {
     return new Promise((resolve, reject) => {
-      if (this.user && this.user.authCode === 0) { return resolve(this.user); }
-      const error = new ErrorExtend(status.PERMISSION_DENIED, '获取失败').createNewError();
+      if (this.user && this.user.authCode === 0) { return resolve(true); }
+      const error = new ErrorExtend(status.PERMISSION_DENIED, '验证失败').createNewError();
       return reject(error);
     });
   }

@@ -16,18 +16,17 @@ const Bcrypt = require('../common/bcrypt');
 
 const UserController = require('../controller/user');
 
-router.get('/info', (request, response, next) => {
-  const { user } = request.session;
-  let resData = {};
-  return $getUserInfo(user).then((_user) => {
-    if (!_user || _user.authCode !== 0) {
-      resData = ResponseExtend.createResMsg(status.PERMISSION_DENIED, '权限验证失败');
-    } else {
-      resData = ResponseExtend.createResMsg(status.OPS_SUCCESS, '权限验证成功');
-    }
-    return response.json(resData);
-  }).catch((error) => { next(error); });
-});
+router.get('/info', (request, response, next) =>
+  new UserController(request)
+    // Retrieve UserName from session
+    .retrieveUserName()
+    // Search UserInfo from db by name
+    .then(userName => new User({ name: userName }, null).retrieveUserInfoByName())
+    // Validate access
+    .then(userInfo => new UserService(userInfo).infoValidate())
+    // Response data
+    .then(result => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '权限验证成功', result)))
+    .catch(next));
 
 router.post('/register', (request, response, next) =>
   new UserController(request)
