@@ -23,5 +23,13 @@ module.exports = {
     }
     return next();
   },
+  filterCarousel(request, response, next) {
+    const _sequence = request.body.sequence.map((carouselInfo) => {
+      const { name = '', url = '', text = '' } = carouselInfo;
+      return { name, url, text };
+    });
+    request.body.sequence = _sequence;
+    return next();
+  },
 };
 

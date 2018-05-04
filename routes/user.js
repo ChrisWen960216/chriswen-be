@@ -3,7 +3,7 @@ const express = require('express');
 const router = express.Router();
 
 const { checkLogin } = require('../middlewares/authCheck');
-const { $getUserInfo, $registerUser } = require('../lib/index');
+// const { $registerUser } = require('../lib/index');
 const User = require('../lib/user');
 
 const ResponseExtend = require('../extends/response');
@@ -33,10 +33,10 @@ router.post('/register', (request, response, next) =>
     // Retrieve userInfo from request body
     .retrieveUserInfo()
     // Bcrypt userInfo
-    .then(userInfo => Promise.all({ name: userInfo.name, password: Bcrypt.hashData(userInfo.password), authCode: userInfo.authCode }))
+    .then(userInfo => Promise.all([userInfo.name, Bcrypt.hashData(userInfo.password), userInfo.authCode]))
     // Save userInfo into DB
-    .then(bcryptInfo => $registerUser(bcryptInfo[0]))
-    // Response data
+    .then(bcryptInfo => new User({ name: bcryptInfo[0], password: bcryptInfo[1], authCode: bcryptInfo[2] }).createUser())
+    // // Response data
     .then(_res => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '注册成功', _res)))
     .catch(next));
 

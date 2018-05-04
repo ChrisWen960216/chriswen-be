@@ -6,7 +6,7 @@ const multer = require('multer');
 const path = require('path');
 const ResponseExtend = require('../extends/response');
 const status = require('../common/status');
-const ErrorExtend = require('../extends/error');
+// const ErrorExtend = require('../extends/error');
 
 const _path = path.join(__dirname, '../public/img/');
 
@@ -15,31 +15,14 @@ const storage = multer.diskStorage({
     callback(null, _path);
   },
   filename(req, file, callback) {
-    console.log(file);
     callback(null, file.originalname);
   },
 });
 const upload = multer({ storage }).single('carousel');
 
-// const upload = multer({ dest: _path }).single('carousel');
-
-
-// router.use();
-
-/**
- *  formiable({
-  uploadDir: path.join(__dirname, '../public/img'),
-  keepExtensions: true,
-})
- */
-router.post('/', (request, response, next) => {
-  upload(request, response, (error) => {
-    if (error) {
-      next(error);
-    }
-    const resData = ResponseExtend.createResData(status.OPS_SUCCESS, '上传成功', request.file);
-    response.json(resData);
-  });
-});
+router.post('/', (request, response, next) => upload(request, response, (error) => {
+  if (error) { return next(error); }
+  return response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '上传成功', request.file));
+}));
 
 module.exports = router;
