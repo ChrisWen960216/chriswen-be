@@ -5,8 +5,7 @@ const mongoose = require('mongoose');
 const router = express.Router();
 
 const {
-  $getAllBlogs, $getBlogById, $getBlogSequence, $updateBlogSequence, $getBlogBySpecies,
-  // $createBlogSquence,
+  $getBlogById, $getBlogSequence, $updateBlogSequence, $getBlogBySpecies,
 } = require('../lib/index');
 
 const { ObjectId } = mongoose.Types;
@@ -20,7 +19,7 @@ const Blog = require('../lib/blog');
 router.get('/', (request, response, next) => {
   const { filter } = request.query;
   new Blog()
-    .retrieveBlogs()
+    .retrieveBlogsByCondition()
     .then(_res => getDataByFilter(filter, _res))
     .then((_filterRes) => {
       let $filterBlogs = _filterRes;

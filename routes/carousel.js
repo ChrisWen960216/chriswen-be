@@ -4,12 +4,7 @@ const router = express.Router();
 const { filterId, filterCarousel } = require('../middlewares/filter');
 
 const ResponseExtends = require('../extends/response');
-const ErrorExtend = require('../extends/error');
 const status = require('../common/status');
-const {
-  $retrieveCarouselSequence,
-  $updateCarouselSequenceById,
-} = require('../lib/index');
 const Carousel = require('../lib/carousel');
 
 // router.post('/', (request, response, next) => $createCarouselSequence()
