@@ -25,7 +25,8 @@ router.get('/info', (request, response, next) =>
     // Validate access
     .then(userInfo => new UserService(userInfo).infoValidate())
     // Response data
-    .then(result => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '权限验证成功', result)))
+    .then(result => ResponseExtend.createResData(status.OPS_SUCCESS, '权限验证成功', result))
+    .then(resData => response.json(resData))
     .catch(next));
 
 router.post('/register', (request, response, next) =>
@@ -37,7 +38,8 @@ router.post('/register', (request, response, next) =>
     // Save userInfo into DB
     .then(bcryptInfo => new User({ name: bcryptInfo[0], password: bcryptInfo[1], authCode: bcryptInfo[2] }).createUser())
     // // Response data
-    .then(_res => response.json(ResponseExtend.createResData(status.OPS_SUCCESS, '注册成功', _res)))
+    .then(_res => ResponseExtend.createResData(status.OPS_SUCCESS, '注册成功', _res))
+    .then(resData => response.json(resData))
     .catch(next));
 
 router.post('/login', (request, response, next) =>

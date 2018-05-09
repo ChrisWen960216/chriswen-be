@@ -18,7 +18,7 @@ const config = require('config-lite')(__dirname);
 // const indexRouter = require('./routes/index');
 const userRouter = require('./routes/user');
 const blogRouter = require('./routes/blog');
-const blogsRouter = require('./routes/blogs');
+const blogListRouter = require('./routes/blogList');
 const uploadRouter = require('./routes/upload');
 const carouselRouter = require('./routes/carousel');
 const filedsRouter = require('./routes/fileds');
@@ -47,14 +47,10 @@ app.use(session({
 
 app.use('/user', userRouter);
 app.use('/blog', blogRouter);
-app.use('/blogs', blogsRouter);
+app.use('/blogList', blogListRouter);
 app.use('/upload', uploadRouter);
 app.use('/carousel', carouselRouter);
 app.use('/fileds', filedsRouter);
-// app.use('/upload', formiable({
-//   uploadDir: path.join(__dirname, '/public/img'),
-//   keepExtensions: true,
-// }), uploadRouter);
 
 
 app.use(notFoundHandle);
